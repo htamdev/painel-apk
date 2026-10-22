@@ -20,6 +20,10 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Instalar dependências
         run: npm install
 
@@ -27,6 +31,15 @@ jobs:
         run: |
           npx cap add android
           npx cap sync android
+
+      - name: Aplicar ícone
+        run: |
+          pip install pillow
+          if curl -fsSL "https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=https://totalgarantidora.com.br&size=256" -o icon.png; then
+            python scripts/gerar_icones.py
+          else
+            echo "::warning::Nao foi possivel baixar o icone"
+          fi
 
       - name: Compilar APK
         working-directory: android
