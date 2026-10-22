@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Total Garantidora - Administradoras</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="logo">
+      <div class="logo-icon"><i class="ti ti-table"></i></div>
+      <span>Administradoras</span>
+    </div>
+    <div class="topbar-right">
+      <!-- Atalhos Rápidos -->
+      <a href="../administradoras/condominios_ativos.html" class="btn" style="background: transparent; border-color: transparent; color: var(--txt2);"><i class="ti ti-building-community"></i> Administradoras</a>
+      <a href="../siglas_honor/siglas_honor.html" class="btn" style="background: transparent; border-color: transparent; color: var(--txt2);"><i class="ti ti-file-invoice"></i> Siglas e Honorários</a>
+      <a href="../sindicos/sindicos.html" class="btn" style="background: transparent; border-color: transparent; color: var(--txt2); margin-right: 15px;"><i class="ti ti-users"></i> Síndicos</a>
+      
+      <!-- Status de Sincronização (Aparecerá apenas na tela de relatórios, se existir) -->
+      <span id="statusAtualizacao" style="color: var(--txt2); font-size: 12px; margin-right: 15px; display: none; align-items: center; gap: 6px;"></span>
+      
+      <!-- Botão Menu Principal -->
+      <a href="../menu.html" class="btn"><i class="ti ti-home"></i> Menu Principal</a>
+    </div>
+  </nav>
+
+  <main class="page">
+    <header class="page-header">
+      <div>
+        <h1 class="page-title">Administradoras</h1>
+        <p class="page-sub">Consulta rápida e gestão de dados operacionais</p>
+      </div>
+    </header>
+
+    <div class="table-wrapper">
+      <div class="table-toolbar">
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input type="text" id="searchInput" placeholder="Pesquisar registro global..." oninput="filterTable()">
+        </div>
+        
+        <div style="position: relative;">
+          <button class="btn col-manager-btn" onclick="toggleColDropdown()">
+            <i class="ti ti-layout-columns"></i> Colunas
+          </button>
+          <div class="col-dropdown" id="colDropdown">
+            <div class="col-dropdown-header">Mostrar colunas</div>
+            <div id="colList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="footer-bar">
+        <span id="rowCount">Carregando...</span>
+        <span id="footerCount"></span>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="detailsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title"><i class="ti ti-maximize" style="color:var(--tg-accent);"></i> Detalhes do Registro</div>
+        <button class="close-btn" onclick="closeDetailsModal()"><i class="ti ti-x"></i></button>
+      </div>
+      <div class="details-grid" id="detailsContent"></div>
+      <div style="text-align: right; margin-top: 20px;">
+        <button class="btn" onclick="closeDetailsModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../api-local.js"></script>
+  <script src="script_adm.js?v=e6f3de47"></script>
+</body>
+</html>

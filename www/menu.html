@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Garantidora | Dashboard</title>
+    <link rel="icon" href="assets/favicon.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <style>
+        .directory-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; max-width: 900px; margin: 0 auto; }
+        .dir-card { text-decoration: none; color: inherit; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; display: flex; align-items: center; gap: 16px; transition: all 0.2s; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+        .dir-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: transparent; transition: background 0.2s; }
+        .dir-card:hover { transform: translateY(-4px); border-color: var(--tg-accent); background: var(--surface2); }
+        .dir-card:hover::before { background: var(--tg-accent); }
+        .dir-icon { background: rgba(126, 217, 87, 0.1); color: var(--tg-accent); width: 54px; height: 54px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 24px; flex-shrink: 0; }
+        .dir-info h3 { font-size: 17px; font-weight: 700; margin-bottom: 4px; color: var(--txt); }
+        .dir-info p { font-size: 13px; color: var(--txt2); line-height: 1.4; }
+        .dir-arrow { margin-left: auto; color: var(--txt3); font-size: 18px; transition: color 0.2s; }
+        .dir-card:hover .dir-arrow { color: var(--tg-accent); }
+
+        .global-search-container { width: 100%; max-width: 700px; margin: 0 auto 50px auto; position: relative; }
+        .global-search-input { width: 100%; padding: 16px 24px 16px 60px; border-radius: 16px; background: rgba(22, 35, 24, 0.6); border: 1px solid var(--border2); color: #fff; font-size: 16px; outline: none; transition: all 0.3s; box-shadow: 0 8px 24px rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
+        .global-search-input::placeholder { color: var(--txt3); }
+        .global-search-input:focus { border-color: var(--tg-accent); background: var(--surface); box-shadow: 0 8px 30px rgba(126, 217, 87, 0.15); }
+        .global-search-icon { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); color: var(--txt2); font-size: 20px; transition: color 0.3s; }
+        .global-search-input:focus + .global-search-icon { color: var(--tg-accent); }
+        
+        .search-results { display: none; position: absolute; top: calc(100% + 10px); left: 0; width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.8); max-height: 450px; overflow-y: auto; z-index: 100; }
+        .search-results.open { display: block; }
+        .result-item { padding: 16px 20px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.2s; }
+        .result-item:hover { background: rgba(126, 217, 87, 0.08); }
+        .result-title { font-size: 15px; color: var(--tg-accent); font-weight: 700; margin-bottom: 6px; }
+        .result-badge { font-size: 10px; background: rgba(126, 217, 87, 0.15); color: var(--tg-accent); padding: 3px 8px; border-radius: 4px; margin-right: 8px; text-transform: uppercase; font-weight: 700; }
+        .result-details { font-size: 12px; color: var(--txt2); line-height: 1.5; }
+
+        .minimal-footer { text-align: center; margin-top: 60px; padding-top: 30px; border-top: 1px solid var(--border); }
+        .minimal-footer .total-chip { display: inline-flex; align-items: center; gap: 10px; background: var(--surface2); padding: 10px 20px; border-radius: 30px; border: 1px solid var(--border); font-size: 14px; color: var(--txt2); margin-bottom: 24px; }
+        .minimal-footer .total-chip strong { color: #fff; font-size: 16px; }
+
+        .vencimentos-container { max-width: 700px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+        .vencimentos-title { font-size: 11px; font-weight: 700; color: var(--txt3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .honor-summary { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+        .honor-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 8px 16px; border-radius: 8px; font-size: 13px; color: var(--txt2); display: flex; align-items: center; gap: 8px; }
+        .honor-item strong { color: var(--tg-accent); font-size: 15px; font-weight: 700; }
+
+        .logo-container { display: flex; justify-content: center; align-items: center; margin-bottom: 40px; padding-top: 20px; width: 100%; }
+        .logo-img { height: 80px; width: auto; object-fit: contain; }
+    </style>
+</head>
+<body>
+    <nav class="topbar">
+        <div class="logo"><div class="logo-icon"><i class="ti ti-shield-check"></i></div><span>Total Garantidora</span></div>
+        <div class="topbar-right">
+            <span style="font-size: 12px; color: var(--txt2); background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border);">
+                <i class="ti ti-server" style="color:var(--tg-accent);"></i> Servidor Local
+            </span>
+        </div>
+    </nav>
+
+	<main class="page">
+        <header class="logo-container">
+            <!-- Caso tenha a logo -->
+            <img src="./assets/LogoTotalBranco.svg" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+        </header>
+
+        <div class="global-search-container">
+            <input type="text" id="inputBuscaGlobal" class="global-search-input" placeholder="Buscar condomínio, contato ou sigla..." autocomplete="off">
+            <i class="ti ti-search global-search-icon"></i>
+            <div id="resultadosBusca" class="search-results"></div>
+        </div>
+
+        <section class="directory-grid">
+            <a href="./administradoras/condominios_ativos.html" class="dir-card">
+                <div class="dir-icon"><i class="ti ti-building-community"></i></div>
+                <div class="dir-info"><h3>Administradoras</h3><p>Lista de condomínios ativos e secretarias</p></div>
+                <div class="dir-arrow"><i class="ti ti-chevron-right"></i></div>
+            </a>
+            <a href="./siglas_honor/siglas_honor.html" class="dir-card">
+                <div class="dir-icon"><i class="ti ti-file-invoice"></i></div>
+                <div class="dir-info"><h3>Siglas e Honorários</h3><p>Gestão de prazos e formas de envio</p></div>
+                <div class="dir-arrow"><i class="ti ti-chevron-right"></i></div>
+            </a>
+            <a href="./sindicos/sindicos.html" class="dir-card">
+                <div class="dir-icon"><i class="ti ti-users"></i></div>
+                <div class="dir-info"><h3>Síndicos</h3><p>Contatos e aniversários da gestão</p></div>
+                <div class="dir-arrow"><i class="ti ti-chevron-right"></i></div>
+            </a>
+            <a href="./relatorios/relatorios.html" class="dir-card">
+                <div class="dir-icon"><i class="ti ti-chart-pie"></i></div>
+                <div class="dir-info"><h3>Relatórios - Arrecadações</h3><p>Métricas em tempo real da operação</p></div>
+                <div class="dir-arrow"><i class="ti ti-chevron-right"></i></div>
+            </a>
+        </section>
+
+        <footer class="minimal-footer">
+            <div class="total-chip">
+                <i class="ti ti-chart-bar" style="color:var(--tg-accent);"></i> 
+                Total de Condomínios Ativos: 
+                <strong id="contadorCondominios">--</strong>
+            </div>
+            
+            <div class="vencimentos-container">
+                <div class="vencimentos-title">
+                    <i class="ti ti-calendar-event"></i> Distribuição de Vencimentos (Ativos)
+                </div>
+                <div id="honorariosResumo" class="honor-summary"></div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="api-local.js"></script>
+    <script>
+        let bancoDeDadosGlobal = [];
+
+        function ehInativo(row) {
+            if (!row) return true;
+            const strRow = JSON.stringify(row).toLowerCase();
+            return strRow.includes('(inativo)') || strRow.includes('inativo');
+        }
+
+        async function carregarDadosGlobais() {
+            try {
+                // 1. CARREGAR ADMINISTRADORAS
+                const resAdm = await fetch('/api/adm');
+                const jsonAdm = await resAdm.json();
+                let admReal = [];
+                let totalAtivos = 0;
+                
+                if (jsonAdm.data && jsonAdm.data.length > 0) {
+                    admReal = jsonAdm.data.filter(row => row && Object.values(row).some(v => v !== ''));
+                    totalAtivos = admReal.filter(row => !ehInativo(row)).length;
+                    admReal.forEach(item => { item._modulo = "Administradoras"; item._link = "./administradoras/condominios_ativos.html"; });
+                }
+                
+                const contadorEl = document.getElementById('contadorCondominios');
+                if (contadorEl) contadorEl.textContent = totalAtivos;
+
+                // 2. CARREGAR VENCIMENTOS E SIGLAS
+                const resHonor = await fetch('/api/honor');
+                const jsonHonor = await resHonor.json();
+                let honorReal = [];
+                let contagemVencimentos = {};
+                
+                if (jsonHonor.data && jsonHonor.data.length > 0) {
+                    honorReal = jsonHonor.data.filter(row => row && Object.values(row).some(v => v !== ''));
+                    honorReal.forEach(item => { item._modulo = "Siglas e Honorários"; item._link = "./siglas_honor/siglas_honor.html"; });
+
+                    honorReal.filter(row => !ehInativo(row)).forEach(row => {
+                        let chaveVenc = Object.keys(row).find(k => k.toLowerCase().includes('venc'));
+                        let vencimento = chaveVenc ? row[chaveVenc] : null;
+
+                        if (vencimento && String(vencimento).trim() !== '' && String(vencimento).trim() !== '-') {
+                            let valor = String(vencimento).trim();
+                            if (/^\d+$/.test(valor)) {
+                                valor = "Dia " + valor;
+                            } else {
+                                valor = valor.charAt(0).toUpperCase() + valor.slice(1);
+                            }
+                            contagemVencimentos[valor] = (contagemVencimentos[valor] || 0) + 1;
+                        }
+                    });
+                }
+
+                // 3. CARREGAR SÍNDICOS
+                const resSind = await fetch('/api/sindicos');
+                const jsonSind = await resSind.json();
+                let sindReal = [];
+                
+                if (jsonSind.data && jsonSind.data.length > 0) {
+                    sindReal = jsonSind.data.filter(row => row && Object.values(row).some(v => v !== ''));
+                    sindReal.forEach(item => { item._modulo = "Síndicos"; item._link = "./sindicos/sindicos.html"; });
+                }
+
+                // UNIR TUDO
+                bancoDeDadosGlobal = [...admReal, ...honorReal, ...sindReal];
+
+                // RENDERIZAR DIAS
+                const containerHonor = document.getElementById('honorariosResumo');
+                if (containerHonor) {
+                    const dias = Object.keys(contagemVencimentos).sort((a, b) => {
+                        const numA = parseInt(a.replace(/\D/g, '')) || 0;
+                        const numB = parseInt(b.replace(/\D/g, '')) || 0;
+                        if (numA !== numB && numA > 0 && numB > 0) return numA - numB;
+                        return a.localeCompare(b);
+                    });
+                    
+                    if (dias.length > 0) {
+                        containerHonor.innerHTML = dias.map(dia => 
+                            `<div class="honor-item">${dia}: <strong>${contagemVencimentos[dia]}</strong></div>`
+                        ).join('');
+                    } else {
+                        containerHonor.innerHTML = `<div class="honor-item" style="opacity: 0.5;">Aguardando dados...</div>`;
+                    }
+                }
+
+            } catch (error) {
+                console.error("Erro ao buscar dados:", error);
+            }
+        }
+
+        const inputBusca = document.getElementById('inputBuscaGlobal');
+        const painelBusca = document.getElementById('resultadosBusca');
+
+        if (inputBusca && painelBusca) {
+            inputBusca.addEventListener('input', function() {
+                const termo = this.value.toLowerCase().trim();
+                if (termo.length < 2) {
+                    painelBusca.classList.remove('open');
+                    return;
+                }
+
+                const resultados = bancoDeDadosGlobal.filter(row => {
+                    const valores = Object.entries(row)
+                        .filter(([key]) => !key.startsWith('_'))
+                        .map(([_, val]) => String(val).toLowerCase());
+                    return valores.some(v => v.includes(termo));
+                });
+
+                if (resultados.length > 0) {
+                    painelBusca.innerHTML = resultados.slice(0, 15).map(r => {
+                        let chaveCondominio = Object.keys(r).find(k => k.toLowerCase().includes('condominio') && !k.startsWith('_'));
+                        let nomeCondominio = (chaveCondominio && r[chaveCondominio]) ? r[chaveCondominio] : '';
+
+                        let resumo = Object.entries(r)
+                            .filter(([k, v]) => !k.startsWith('_') && k !== chaveCondominio && String(v).trim() !== '')
+                            .map(([k, v]) => {
+                                let nomeLimpo = k.replace(/^col_/, '').replace(/_/g, ' ');
+                                return `<span style="display:block; margin-top:4px;"><b>${nomeLimpo.toUpperCase()}:</b> ${v}</span>`;
+                            }).join('');
+                        
+                        let params = new URLSearchParams();
+                        params.append('q', nomeCondominio.replace(/<[^>]*>?/gm, '').trim()); 
+                        let linkComParametro = `${r._link}?${params.toString()}`;
+                        
+                        return `
+                        <div class="result-item" onclick="window.location.href='${linkComParametro}'">
+                            <div class="result-title">
+                                <span class="result-badge">${r._modulo}</span>
+                                ${nomeCondominio}
+                            </div>
+                            <div class="result-details">${resumo}</div>
+                        </div>`;
+                    }).join('');
+                    painelBusca.classList.add('open');
+                } else {
+                    painelBusca.innerHTML = `<div class="result-item" style="text-align:center; color:var(--txt3);">Nenhum resultado encontrado.</div>`;
+                    painelBusca.classList.add('open');
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.global-search-container')) {
+                    painelBusca.classList.remove('open');
+                }
+            });
+        }
+
+        window.onload = carregarDadosGlobais;
+    </script>
+</body>
+</html>

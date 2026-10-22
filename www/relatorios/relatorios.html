@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Garantidora - Relatórios</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .kpi-grid { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 30px; }
+        .kpi-card { flex: 1; min-width: 150px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; box-shadow: var(--shadow); position: relative; overflow: hidden; transition: transform 0.2s; }
+        .kpi-card:hover { transform: translateY(-3px); border-color: var(--border2); }
+        .kpi-card h4 { font-size: 11px; color: var(--txt2); margin-bottom: 8px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .kpi-card .value { font-size: 30px; font-weight: 700; color: var(--tg-accent); transition: color 0.3s; }
+        .kpi-blue .value { color: #4facfe; }
+        .kpi-red .value { color: #ff6b6b; }
+        .kpi-yellow .value { color: #f6d365; }
+
+        .reports-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; align-items: start; }
+        .report-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column; }
+        .report-header { background: rgba(255,255,255,0.02); padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 700; color: var(--txt); text-transform: uppercase; display: flex; align-items: center; gap: 10px; letter-spacing: 0.5px; }
+        .report-header i { color: var(--tg-accent); font-size: 18px; }
+        .report-body { padding: 0; overflow-x: auto; flex: 1; }
+        
+        .report-card table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        .report-card th, .report-card td { padding: 14px 16px; border-bottom: 1px solid var(--border2); }
+        .report-card th { color: var(--txt2); font-weight: 700; background: var(--header-bg); text-transform: uppercase; font-size: 11px; }
+        .report-card tr:last-child td { border-bottom: none; }
+        .report-card tr:hover td { background: var(--row-hover); }
+
+        .mes-vigente-box { background: rgba(126, 217, 87, 0.05); border: 1px solid var(--border); padding: 12px 24px; border-radius: 12px; text-align: center; box-shadow: var(--shadow); }
+        .mes-vigente-box span { font-size: 10px; color: var(--txt2); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .mes-vigente-box strong { display: block; font-size: 18px; color: var(--tg-accent); margin-top: 4px; }
+
+        @keyframes flashUpdate { 0% { background-color: rgba(126, 217, 87, 0.15); } 100% { background-color: transparent; } }
+        .updated { animation: flashUpdate 1.5s ease-out; }
+
+        /* Estilos do Quadro de Colaboradores */
+        .colaborador-section { margin-top: 50px; border-top: 1px solid var(--border); padding-top: 30px; }
+        .colaborador-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .colaborador-header h2 { font-size: 18px; color: var(--txt); display: flex; align-items: center; gap: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .board { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; }
+        .board-col { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; min-width: 650px; flex: 1; display: flex; flex-direction: column; max-height: 600px; box-shadow: var(--shadow); }
+        .board-col-header { background: rgba(0,0,0,0.2); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .board-col-title { color: var(--txt); font-weight: 700; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .board-col-count { background: var(--tag-bg); color: var(--tg-accent); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; }
+        
+        .board-items { padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+        .board-item { background: rgba(255,255,255,0.02); border: 1px solid var(--border2); padding: 14px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; transition: all 0.2s; }
+        .board-item:hover { background: var(--row-hover); border-color: var(--tg-accent); transform: translateX(3px); }
+        .item-name { font-weight: 600; color: #fff; font-size: 12px; flex: 1; line-height: 1.4; }
+        .item-status { font-size: 9px; padding: 5px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase; text-align: left; white-space: nowrap; letter-spacing: 0.5px; }
+        
+        /* Paleta de Cores dos Status */
+        .st-finalizado { background: rgba(126, 217, 87, 0.15); color: #7ED957; border: 1px solid rgba(126, 217, 87, 0.3); }
+        .st-atraso, .st-pendente { background: rgba(255, 107, 107, 0.15); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); }
+        .st-ag-docs { background: rgba(246, 211, 101, 0.15); color: #f6d365; border: 1px solid rgba(246, 211, 101, 0.3); }
+        .st-aguardando, .st-andamento { background: rgba(79, 172, 254, 0.15); color: #4facfe; border: 1px solid rgba(79, 172, 254, 0.3); }
+        .st-default { background: rgba(255, 255, 255, 0.05); color: #ccc; border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        .board-items::-webkit-scrollbar { width: 4px; }
+        .board-items::-webkit-scrollbar-track { background: transparent; }
+        .board-items::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <nav class="topbar">
+        <div class="logo"><div class="logo-icon"><i class="ti ti-chart-pie"></i></div><span>Relatórios e Metas</span></div>
+        <div class="topbar-right">
+            <span id="statusAtualizacao" style="color: var(--txt2); font-size: 12px; margin-right: 15px; display: inline-flex; align-items: center; gap: 6px;">
+                <i class="ti ti-refresh ti-spin"></i> Sincronizando...
+            </span>
+            <a href="../menu.html" class="btn"><i class="ti ti-home"></i> Menu Principal</a>
+        </div>
+    </nav>
+
+    <main class="page">
+        <header class="page-header" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h1 class="page-title">Painel Operacional</h1>
+                <p class="page-sub">Acompanhamento automático e produtividade em tempo real</p>
+            </div>
+            <div class="mes-vigente-box updated">
+                <span>Mês Vigente</span>
+                <strong id="mesVigenteDisplay">--</strong>
+            </div>
+        </header>
+
+        <!-- KPIs Principais -->
+        <div class="kpi-grid">
+            <div class="kpi-card"><h4>Total Condomínios</h4><div class="value" id="kpi-total">--</div></div>
+            <div class="kpi-card"><h4>Concluídos</h4><div class="value" id="kpi-finalizados">--</div></div>
+            <div class="kpi-card kpi-blue"><h4>Em Andamento</h4><div class="value" id="kpi-andamento">--</div></div>
+            <div class="kpi-card kpi-red"><h4>Pendentes</h4><div class="value" id="kpi-pendentes">--</div></div>
+            <div class="kpi-card kpi-yellow"><h4>Ag. Documentos</h4><div class="value" id="kpi-ag-documentos">--</div></div>
+            <div class="kpi-card kpi-red"><h4>Atrasados</h4><div class="value" id="kpi-atrasados">--</div></div>
+            <div class="kpi-card kpi-yellow"><h4>% Conclusão</h4><div class="value" id="kpi-conclusao">--</div></div>
+            <div class="kpi-card kpi-blue"><h4>Aguardando Entrega</h4><div class="value" id="kpi-aguardando">--</div></div>
+        </div>
+
+        <!-- Tabelas -->
+        <div class="reports-grid">
+            <div class="report-card">
+                <div class="report-header"><i class="ti ti-calendar-stats"></i> Status por Vencimento</div>
+                <div class="report-body"><table id="tbl-vencimentos"></table></div>
+            </div>
+
+            <div class="report-card">
+                <div class="report-header"><i class="ti ti-alert-triangle"></i> Processo Pendente</div>
+                <div class="report-body"><table id="tbl-alertas"></table></div>
+                
+                <div class="report-header" style="border-top: 1px solid var(--border);"><i class="ti ti-clock"></i> Média de Dias</div>
+                <div class="report-body"><table id="tbl-medias"></table></div>
+            </div>
+
+            <div class="report-card">
+                <div class="report-header"><i class="ti ti-users"></i> Arrecadação por Colaborador</div>
+                <div class="report-body"><table id="tbl-colaborador"></table></div>
+            </div>
+
+            <div class="report-card" style="grid-column: 1 / -1;">
+                <div class="report-header"><i class="ti ti-chart-line"></i> Comparativo Mensal — Média de Dias e Conclusão</div>
+                <div class="report-body"><table id="tbl-comparativo"></table></div>
+            </div>
+        </div>
+
+        <!-- Quadro Kanban: Colaboradores -->
+        <div class="colaborador-section">
+            <div class="colaborador-header">
+                <h2><i class="ti ti-layout-kanban"></i> Controle por Colaborador</h2>
+                <div class="search-wrap" style="max-width: 350px; margin: 0;">
+                    <i class="ti ti-filter"></i>
+                    <input type="text" id="filterColaborador" placeholder="Filtrar por condomínio ou status..." onkeyup="filtrarColaboradores()">
+                </div>
+            </div>
+            <div class="board" id="boardColaboradores">
+                <!-- Os cartões serão gerados aqui pelo JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <script src="script_relatorios.js"></script>
+</body>
+</html>
